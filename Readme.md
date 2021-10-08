@@ -73,8 +73,8 @@ You can deploy this bot anywhere.
 <details><summary>Deploy To Heroku</summary>
 <p>
 <br>
-<a href="https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2FLallu-lallus%2Fauto-filter-v2.03/tree/main">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
+<a href="https://github.com/Lallu-lallus/auto-filter-v2.03tree/main">
+  <img src="https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2FLallu-lallus%2Fauto-filter-v2.03" alt="Deploy">
 </a>
 </p>
 </details>
