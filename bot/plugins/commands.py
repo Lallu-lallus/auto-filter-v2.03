@@ -1,106 +1,199 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# (c) @AlbertEinsteinTG
+import os
+import logging
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from info import START_MSG, CHANNELS, ADMINS, AUTH_CHANNEL, CUSTOM_FILE_CAPTION
+from utils import Media, get_file_details, get_size
+from pyrogram.errors import UserNotParticipant
+logger = logging.getLogger(__name__)
 
-from pyrogram import filters, Client
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from bot import Translation, LOGGER # pylint: disable=import-error
-from bot.database import Database # pylint: disable=import-error
-
-db = Database()
-
-@Client.on_message(filters.command(["start"]) & filters.private, group=1)
-async def start(bot, update):
-    
-    try:
-        file_uid = update.command[1]
-    except IndexError:
-        file_uid = False
-    
-    if file_uid:
-        file_id, file_name, file_caption, file_type = await db.get_file(file_uid)
-        
-        if (file_id or file_type) == None:
-            return
-        
-        caption = file_caption if file_caption != ("" or None) else ("<code>" + file_name + "</code>")
-        try:
-            await update.reply_cached_media(
-                file_id,
-                quote=True,
-                caption = caption,
-                parse_mode="html",
-                reply_markup=InlineKeyboardMarkup(
-                    [
+@Client.on_message(filters.command("start"))
+async def start(bot, cmd):
+    usr_cmdall1 = cmd.text
+    if usr_cmdall1.startswith("/start subinps"):
+        if AUTH_CHANNEL:
+            invite_link = await bot.create_chat_invite_link(int(AUTH_CHANNEL))
+            try:
+                user = await bot.get_chat_member(int(AUTH_CHANNEL), cmd.from_user.id)
+                if user.status == "kicked":
+                    await bot.send_message(
+                        chat_id=cmd.from_user.id,
+                        text="Sorry Sir, You are Banned to use me.",
+                        parse_mode="markdown",
+                        disable_web_page_preview=True
+                    )
+                    return
+            except UserNotParticipant:
+                ident, file_id = cmd.text.split("_-_-_-_")
+                await bot.send_message(
+                    chat_id=cmd.from_user.id,
+                    text="**Please Join My Updates Channel to use this Bot!**",
+                    reply_markup=InlineKeyboardMarkup(
                         [
-                            InlineKeyboardButton
-                                (
-                                    'Developers', url="https://t.me/tg_bots_disccurssions"
-                                )
+                            [
+                                InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+                            ],
+                            [
+                                InlineKeyboardButton(" 🔄 Try Again", callback_data=f"checksub#{file_id}")
+                            ]
                         ]
-                    ]
+                    ),
+                    parse_mode="markdown"
                 )
+                return
+            except Exception:
+                await bot.send_message(
+                    chat_id=cmd.from_user.id,
+                    text="Something went Wrong.",
+                    parse_mode="markdown",
+                    disable_web_page_preview=True
+                )
+                return
+        try:
+            ident, file_id = cmd.text.split("_-_-_-_")
+            filedetails = await get_file_details(file_id)
+            for files in filedetails:
+                title = files.file_name
+                size=get_size(files.file_size)
+                f_caption=files.caption
+                if CUSTOM_FILE_CAPTION:
+                    try:
+                        f_caption=CUSTOM_FILE_CAPTION.format(file_name=title, file_size=size, file_caption=f_caption)
+                    except Exception as e:
+                        print(e)
+                        f_caption=f_caption
+                if f_caption is None:
+                    f_caption = f"{files.file_name}"
+                buttons = [
+                    [
+                        InlineKeyboardButton('Search again', switch_inline_query_current_chat=''),
+                        InlineKeyboardButton('More Bots', url='https://t.me/subin_works/122')
+                    ]
+                    ]
+                await bot.send_cached_media(
+                    chat_id=cmd.from_user.id,
+                    file_id=file_id,
+                    caption=f_caption,
+                    reply_markup=InlineKeyboardMarkup(buttons)
+                    )
+        except Exception as err:
+            await cmd.reply_text(f"Something went wrong!\n\n**Error:** `{err}`")
+    elif len(cmd.command) > 1 and cmd.command[1] == 'subscribe':
+        invite_link = await bot.create_chat_invite_link(int(AUTH_CHANNEL))
+        await bot.send_message(
+            chat_id=cmd.from_user.id,
+            text="**Please Join My Updates Channel to use this Bot!**",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("🤖 Join Updates Channel", url=invite_link.invite_link)
+                    ]
+                ]
             )
-        except Exception as e:
-            await update.reply_text(f"<b>Error:</b>\n<code>{e}</code>", True, parse_mode="html")
-            LOGGER(__name__).error(e)
+        )
+    else:
+        await cmd.reply_text(
+            START_MSG,
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton("Search Here", switch_inline_query_current_chat=''),
+                        InlineKeyboardButton("support group", url="https://t.me/tg_bots_disccurssions")
+                    ],
+                    [
+                        InlineKeyboardButton("About", callback_data="about")
+                    ]
+                ]
+            )
+        )
+
+
+@Client.on_message(filters.command('channel') & filters.user(ADMINS))
+async def channel_info(bot, message):
+    """Send basic information of channel"""
+    if isinstance(CHANNELS, (int, str)):
+        channels = [CHANNELS]
+    elif isinstance(CHANNELS, list):
+        channels = CHANNELS
+    else:
+        raise ValueError("Unexpected type of CHANNELS")
+
+    text = '📑 **Indexed channels/groups**\n'
+    for channel in channels:
+        chat = await bot.get_chat(channel)
+        if chat.username:
+            text += '\n@' + chat.username
+        else:
+            text += '\n' + chat.title or chat.first_name
+
+    text += f'\n\n**Total:** {len(CHANNELS)}'
+
+    if len(text) < 4096:
+        await message.reply(text)
+    else:
+        file = 'Indexed channels.txt'
+        with open(file, 'w') as f:
+            f.write(text)
+        await message.reply_document(file)
+        os.remove(file)
+
+
+@Client.on_message(filters.command('total') & filters.user(ADMINS))
+async def total(bot, message):
+    """Show total files in database"""
+    msg = await message.reply("Processing...⏳", quote=True)
+    try:
+        total = await Media.count_documents()
+        await msg.edit(f'📁 Saved files: {total}')
+    except Exception as e:
+        logger.exception('Failed to check total files')
+        await msg.edit(f'Error: {e}')
+
+
+@Client.on_message(filters.command('logger') & filters.user(ADMINS))
+async def log_file(bot, message):
+    """Send log file"""
+    try:
+        await message.reply_document('TelegramBot.log')
+    except Exception as e:
+        await message.reply(str(e))
+
+
+@Client.on_message(filters.command('delete') & filters.user(ADMINS))
+async def delete(bot, message):
+    """Delete file from database"""
+    reply = message.reply_to_message
+    if reply and reply.media:
+        msg = await message.reply("Processing...⏳", quote=True)
+    else:
+        await message.reply('Reply to file with /delete which you want to delete', quote=True)
         return
 
-    buttons = [[
-        InlineKeyboardButton('Developers', url='https://t.me/tg_bots_disccurssions'),
-        InlineKeyboardButton('Source Code 🧾', url ='https://github.com/Lallu-lallus/auto-filter-v2.03')
-    ],[
-        InlineKeyboardButton('Support 🛠', url='https://t.me/tg_bots_disccurssions')
-    ],[
-        InlineKeyboardButton('Help ⚙', callback_data="help")
-    ]]
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.START_TEXT.format(
-                update.from_user.first_name),
-        reply_markup=reply_markup,
-        parse_mode="html",
-        reply_to_message_id=update.message_id
-    )
+    for file_type in ("document", "video", "audio"):
+        media = getattr(reply, file_type, None)
+        if media is not None:
+            break
+    else:
+        await msg.edit('This is not supported file format')
+        return
 
-
-@Client.on_message(filters.command(["help"]) & filters.private, group=1)
-async def help(bot, update):
-    buttons = [[
-        InlineKeyboardButton('Home ⚡', callback_data='start'),
-        InlineKeyboardButton('About 🚩', callback_data='about')
-    ],[
-        InlineKeyboardButton('Close 🔐', callback_data='close')
-    ]]
-    
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.HELP_TEXT,
-        reply_markup=reply_markup,
-        parse_mode="html",
-        reply_to_message_id=update.message_id
-    )
-
-
-@Client.on_message(filters.command(["about"]) & filters.private, group=1)
-async def about(bot, update):
-    
-    buttons = [[
-        InlineKeyboardButton('Home ⚡', callback_data='start'),
-        InlineKeyboardButton('Close 🔐', callback_data='close')
-    ]]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    await bot.send_message(
-        chat_id=update.chat.id,
-        text=Translation.ABOUT_TEXT,
-        reply_markup=reply_markup,
-        disable_web_page_preview=True,
-        parse_mode="html",
-        reply_to_message_id=update.message_id
-    )
+    result = await Media.collection.delete_one({
+        'file_name': media.file_name,
+        'file_size': media.file_size,
+        'mime_type': media.mime_type
+    })
+    if result.deleted_count:
+        await msg.edit('File is successfully deleted from database')
+    else:
+        await msg.edit('File not found in database')
+@Client.on_message(filters.command('about'))
+async def bot_info(bot, message):
+    buttons = [
+        [
+            InlineKeyboardButton('Update Channel', url='https://t.me/tg_bots_disccurssions'),
+            InlineKeyboardButton('Source Code', url='https://github.com/Lallu-lallus/auto-filter-v2.03')
+        ]
+        ]
+    await message.reply(text="Language : <code>Python3</code>\nLibrary : <a href='https://docs.pyrogram.org/'>Pyrogram asyncio</a>\nSource Code : <a href='https://github.com/Lallu-lallus/auto-filter-v2.03'>Click here</a>\nSupport group : <a href='https://t.me/tg_bots_disccurssions'>XTZ Bots</a> </b>", reply_markup=InlineKeyboardMarkup(buttons), disable_web_page_preview=True)
