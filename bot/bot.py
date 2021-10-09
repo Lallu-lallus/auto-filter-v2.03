@@ -1,40 +1,40 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# (c) @SpEcHIDe
+import logging
+import logging.config
+
+# Get logging configurations
+logging.config.fileConfig('logging.conf')
+logging.getLogger().setLevel(logging.ERROR)
 
 from pyrogram import Client, __version__
-
-from . import API_HASH, APP_ID, LOGGER, BOT_TOKEN 
-
-from .user import User
+from pyrogram.raw.all import layer
+from utils import Media
+from info import SESSION, API_ID, API_HASH, BOT_TOKEN
+import pyromod.listen
 
 class Bot(Client):
-    USER: User = None
-    USER_ID: int = None
 
     def __init__(self):
         super().__init__(
-            "bot",
+            session_name=SESSION,
+            api_id=API_ID,
             api_hash=API_HASH,
-            api_id=APP_ID,
-            plugins={
-                "root": "bot/plugins"
-            },
-            workers=400,
             bot_token=BOT_TOKEN,
-            sleep_threshold=10
+            workers=50,
+            plugins={"root": "plugins"},
+            sleep_threshold=5,
         )
-        self.LOGGER = LOGGER
 
     async def start(self):
         await super().start()
-        bot_details = await self.get_me()
-        self.set_parse_mode("html")
-        self.LOGGER(__name__).info(
-            f"@{bot_details.username}  started! "
-        )
-        self.USER, self.USER_ID = await User().start()
+        await Media.ensure_indexes()
+        me = await self.get_me()
+        self.username = '@' + me.username
+        print(f"{me.first_name} with for Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
 
     async def stop(self, *args):
         await super().stop()
-        self.LOGGER(__name__).info("Bot stopped. Bye.")
+        print("Bot stopped. Bye.")
+
+
+app = Bot()
+app.run()
