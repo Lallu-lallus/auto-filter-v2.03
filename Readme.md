@@ -1,110 +1,88 @@
-# Adv Auto Filter Bot V2
+# Modified Version Of [Media Search bot](https://github.com/Lallu-lallus/auto-filter-v2.03)
+Pm
+## Added Features
+* Imdb posters for autofilter.
+* Custom captions for your files.
+* Index command to index all the files in a given channel (No USER_SESSION Required).
+* Ability to Index Public Channels without being admin.
+* Support Auto-Filter (Both in PM and in Groups)
+* Once files saved in Database , exists until you manually deletes. (No Worry if post gets deleted from source channel.)
+* Added Force subscribe (Only channel subscribes can use the bot)
+* Ability to restrict groups(AUTH_GROUPS)
 
-<p align="center">
-  <a href="https://github.com/Lallu-lallus/auto-filter-v2.03/stargazers">
-    <img src="https://github.com/Lallu-lallus/auto-filter-v2.03?style=social">
+## Installation
 
-  </a>
-  
-  <a href="https://github.com/Lallu-lallus/auto-filter-v2.03/fork">
-    <img src="https://github.com/Lallu-lallus/auto-filter-v2.03?label=Fork&style=social">
+### Easy Way
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2FLallu-lallus%2Fauto-filter-v2.03)
+### Hard Way
 
-  </a>  
-</p>
+```bash
+# Create virtual environment
+python3 -m venv env
 
-__This Is Just An Simple Advance Auto Filter Bot Complete Rewritten Version Of [Adv-Filter-Bot](https://github.com/CrazyBotsz/Adv-Auto-Filter-Bot)..__
+# Activate virtual environment
+env\Scripts\activate.bat # For Windows
+source env/bin/activate # For Linux or MacOS
 
-__Just Sent Any Text As Query It Will Search For All Connected Chat's Files In Its MongoDB And Reply You With The Message Link As A Button__
-
-
-## Usage
-
-**__How To Use Me!?__**
-
-* -> Add me to any group and make me admin<br>
-* -> Add me to your channel as admin with full previlages
-
-**Bot Commands (Works Only In Groups) :**
-
-
-  * -> `/add chat_id`<br>
-     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-OR
-     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- To establish a connection of group with a channel (Bot should be admin with full previlages in both group and channel)<br>
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`/add @Username`
-
-
-  * -> `/del chat_id`<br>
-     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-OR 
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- To delete a group's coneection with a channel (Use disable option from settigns pannel for disconnecting temporarily instead of deleteing)<br>
-    &nbsp;&nbsp;&nbsp;&nbsp; `/del @Username`
-
-
-  * -> `/delall`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - To delete all connections of a group and deletes all its file from DB
-  
-  * -> `/settings`&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -  To disaply a Settings Pannel Instance which can be used to tweek bot's settings accordingly
-
-    * -> Channel - Button will show you all the connected chats with the group along with there index buttons correspnding to there order for furthur controls...
-
-    * -> Filter Types - Button will show you the 3 filter types available in bot... Pressing each buttons will either enable or disable them and this will take into action as soon as you use them...without the need of a restart....
-
-    * -> Configure - Button will help you to change no. of pages/ buttons per page/ total result without acutally editing the repo... Also it provide option to Enable/Disable  showing Invite Link in each results
-
-    * -> Status - Button will show the stats of your current group
-
-### Pre Requisites 
-------------------
-* ->__Your Bot Token From [@BotFather](http://www.telegram.dog/BotFather)__
-
-* ->__Your APP ID And API Harsh From [Telegram](http://www.my.telegram.org) or [@UseTGXBot](http://www.telegram.dog/UseTGXBot)__
-
-* ->__Your User Session String Obtained From [@PyrogramStringBot](http://www.telegram.dog/PyrogramStringBot)__
-
-* ->__Mongo DB URL Obtained From [Mongo DB](http://www.mongodb.com)__
-
-#### PR's Are Very Welcome
-
-## Deploy
-You can deploy this bot anywhere.
-
-<i>**[Watch Deploying Tutorial...](https://youtu.be/KTearEPhumc)**</i>
-
-<details><summary>Deploy To Heroku</summary>
-<p>
-<br>
-<a href="https://dashboard.heroku.com/new?template=https%3A%2F%2Fgithub.com%2FLallu-lallus%2Fauto-filter-v2.03/tree/main">
-  <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy">
-</a>
-</p>
-</details>
-
-<details><summary>Deploy To VPS</summary>
-<p>
-<pre>
-git clone https://github.com/CrazyBotsz/Adv-Auto-Filter-Bot-V2
-cd Adv-Auto-Filter-Bot-V2
+# Install Packages
 pip3 install -r requirements.txt
-# Change The Vars Of bot/__init__.py File Accordingly
-python3 -m bot
-</pre>
-</p>
-</details>
 
-## Support   
-Join Our [Telegram Group](https://www.telegram.dog/tg_bots_disccurssions) For Support/Assistance And Our [Channel](https://www.telegram.dog/CrazyBotsz) For Updates.   
-   
-Report Bugs, Give Feature Requests There..   
-Do Fork And Star The Repository If You Liked It.
+# Edit info.py with variables as given below then run bot
+python3 bot.py
+```
+Check [`sample_info.py`](sample_info.py) before editing [`info.py`](info.py) file
 
-## Disclaimer
-[![GNU Affero General Public License v3.0](https://www.gnu.org/graphics/agplv3-155x51.png)](https://www.gnu.org/licenses/agpl-3.0.en.html#header)    
-Licensed under [GNU AGPL v3.0.](https://github.com/Lallu-lallus/auto-filter-v2.03/blob/main/LICENSE)
-Selling The Codes To Other People For Money Is *Strictly Prohibited*.
+## Variables
+
+### Required Variables
+* `BOT_TOKEN`: Create a bot using [@BotFather](https://telegram.dog/BotFather), and get the Telegram API token.
+* `API_ID`: Get this value from [telegram.org](https://my.telegram.org/apps)
+* `API_HASH`: Get this value from [telegram.org](https://my.telegram.org/apps)
+* `CHANNELS`: Username or ID of channel or group. Separate multiple IDs by space
+* `ADMINS`: Username or ID of Admin. Separate multiple Admins by space
+* `DATABASE_URI`: [mongoDB](https://www.mongodb.com) URI. Get this value from [mongoDB](https://www.mongodb.com). For more help watch this [video](https://youtu.be/dsuTn4qV2GA)
+* `DATABASE_NAME`: Name of the database in [mongoDB](https://www.mongodb.com). For more help watch this [video](https://youtu.be/dsuTn4qV2GA)
+
+### Optional Variables
+* `OMDB_API_KEY`: OMBD_API_KEY to generate imdb poster for filter results.Get it from [omdbapi.com](http://www.omdbapi.com/apikey.aspx)
+* `CUSTOM_FILE_CAPTION` : A custom caption for your files. You can format it with file_name, file_size, file_caption.(supports html formating)
+Example: `<b>Join [XTZ Bots](https://t.me/subin_works) for more useful bots</b>\n\n<code>{file_name}</code>\nSize{file_size}\n{file_caption}.`
+* `AUTH_GROUPS` : ID of groups which bot should work as autofilter, bot can only work in thease groups. If not given , bot can be used in any group.
+* `COLLECTION_NAME`: Name of the collections. Defaults to Telegram_files. If you going to use same database, then use different collection name for each bot
+* `CACHE_TIME`: The maximum amount of time in seconds that the result of the inline query may be cached on the server
+* `USE_CAPTION_FILTER`: Whether bot should use captions to improve search results. (True/False)
+* `AUTH_USERS`: Username or ID of users to give access of inline search. Separate multiple users by space. Leave it empty if you don't want to restrict bot usage.
+* `AUTH_CHANNEL`: ID of channel. Without subscribing this channel users cannot use bot.
+* `START_MSG`: Welcome message for start command.
+
+## Note
+* Currently [API used](http://www.omdbapi.com) here is allowing 1000 requests per day. [You may not get posters if its crossed](https://t.me/ThankTelegram/910168). 
+Once a poster is fetched from OMDB , poster is saved to DB to reduce duplicate requests.
+
+## Admin commands
+```
+channel - Get basic infomation about channels
+total - Show total of saved files
+delete - Delete file from database
+index - Index all files from channel.
+logger - Get log file
+```
+
+## Tips
+* You can use `|` to separate query and file type while searching for specific type of file. For example: `Avengers | video`
+* If you don't want to create a channel or group, use your chat ID / username as the channel ID. When you send a file to a bot, it will be saved in the database.
 
 
-## Credits
 
- - Thanks To Dan For His Awsome [Libary](https://github.com/pyrogram/pyrogram)
- - Thanks To SpEcHiDe For His Awesome [DeleteMessagesRoBot](https://github.com/SpEcHiDe/DeleteMessagesRoBot)
- - [Thanks To Me 👀](https://github.com/Lallu-lallus/auto-filter-v2.03)
+## Thanks to 
+* [Pyrogram](https://github.com/pyrogram/pyrogram)
+* Original [Repo](https://github.com/Mahesh0253/Media-Search-bot)
+
+
+## Support
+Contact Me On [Telegram](https://t.me/subinps_bot)
+
+[Update Channel](https://t.me/subin_works)
+
+## License
+Code released under [The GNU General Public License](LICENSE).
