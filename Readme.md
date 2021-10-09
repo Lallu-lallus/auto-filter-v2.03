@@ -1,4 +1,4 @@
-# Modified Version Of [Media Search bot](https://github.com/Lallu-lallus/auto-filter-v2.03)
+# Auto filter v2.03(https://github.com/Lallu-lallus/auto-filter-v2.03)
 Pm
 ## Added Features
 * Imdb posters for autofilter.
